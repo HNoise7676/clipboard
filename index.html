@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MDM Medic Clipboard</title>
+    <style>
+        :root {
+            --bg: #2c2f33;
+            --card: #36393f;
+            --text: #ffffff;
+            --accent: #5865F2;
+            --success: #43b581;
+            --input: #40444b;
+        }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; padding: 20px; }
+        .card { background: var(--card); padding: 25px; border-radius: 12px; width: 100%; max-width: 450px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+        h2 { text-align: center; color: var(--accent); margin-top: 0; letter-spacing: 1px; border-bottom: 1px solid #4f545c; padding-bottom: 10px; }
+        
+        .field-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; color: #b9bbbe; }
+        
+        input, textarea { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #23272a; background: var(--input); color: white; box-sizing: border-box; font-size: 1rem; }
+        
+        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+        button.primary { flex: 2; padding: 14px; border: none; border-radius: 6px; background: var(--accent); color: white; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 1rem; }
+        button.secondary { flex: 1; background: #ed4245; border: none; border-radius: 6px; color: white; cursor: pointer; }
+        
+        button:hover { opacity: 0.9; }
+        .copy-hint { text-align: center; font-size: 0.9em; margin-top: 15px; color: var(--success); font-weight: bold; opacity: 0; transition: 0.3s; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>FIELD MEDIC UNIT</h2>
+    
+    <div class="field-group">
+        <label>Patient Name</label>
+        <input type="text" id="patientName" placeholder="e.g. Crowl" oninput="autoSave()">
+    </div>
+
+    <div class="field-group">
+        <label>Clinical Notes</label>
+        <textarea id="notes" rows="8" placeholder="- symptom 1&#10;- symptom 2" oninput="autoSave()"></textarea>
+    </div>
+
+    <div class="btn-group">
+        <button class="primary" onclick="generateAndCopy()">Copy to Discord</button>
+        <button class="secondary" onclick="clearForm()">Clear All</button>
+    </div>
+    
+    <p id="hint" class="copy-hint">Timestamped & Copied!</p>
+</div>
+
+<script>
+// 1. Load data from memory when the page opens
+window.onload = () => {
+    if (localStorage.getItem('mdm_patient')) {
+        document.getElementById('patientName').value = localStorage.getItem('mdm_patient');
+    }
+    if (localStorage.getItem('mdm_notes')) {
+        document.getElementById('notes').value = localStorage.getItem('mdm_notes');
+    }
+};
+
+// 2. Save data to memory every time you type a character
+function autoSave() {
+    localStorage.setItem('mdm_patient', document.getElementById('patientName').value);
+    localStorage.setItem('mdm_notes', document.getElementById('notes').value);
+}
+
+function getFormattedTime() {
+    const now = new Date();
+    const dateStr = `${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()}`;
+    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).toLowerCase();
+    
+    // Auto-detect timezone
+    const tzStr = new Intl.DateTimeFormat('en-US', { timeZoneName: 'short' }).formatToParts(now).find(p => p.type === 'timeZoneName').value;
+
+    return `${dateStr} at ${timeStr} (${tzStr})`;
+}
+
+function generateAndCopy() {
+    const name = document.getElementById('patientName').value.trim() || "Unknown Patient";
+    const notes = document.getElementById('notes').value.trim();
+    const time = getFormattedTime();
+    
+    const markdown = `# ${name}\n**Logged:** ${time}\n\n**Notes:**\n${notes}`;
+
+    navigator.clipboard.writeText(markdown).then(() => {
+        const hint = document.getElementById('hint');
+        hint.style.opacity = '1';
+        setTimeout(() => { hint.style.opacity = '0'; }, 2000);
+    });
+}
+
+function clearForm() {
+    if (confirm("Are you sure you want to clear the clipboard? This cannot be undone.")) {
+        document.getElementById('patientName').value = '';
+        document.getElementById('notes').value = '';
+        localStorage.removeItem('mdm_patient');
+        localStorage.removeItem('mdm_notes');
+    }
+}
+</script>
+
+</body>
+</html>
