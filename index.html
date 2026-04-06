@@ -27,7 +27,6 @@
             padding: 20px;
             margin: 0;
             font-family: 'Courier New', Courier, monospace;
-            /* Prevents weird bouncing on mobile */
             overflow-x: hidden;
         }
 
@@ -105,7 +104,6 @@
             box-sizing: border-box; 
             font-family: inherit;
             font-size: 1rem;
-            /* REMOVE RESIZE ABILITY */
             resize: none; 
         }
 
@@ -136,7 +134,6 @@
             opacity: 0; 
         }
 
-        /* Mobile Adjustments */
         @media (max-width: 400px) {
             .paper { padding: 15px; }
             h2 { font-size: 1.1rem; }
@@ -166,7 +163,7 @@
             <button onclick="clearForm()">VOID</button>
         </div>
         
-        <p id="hint" class="copy-hint">✓ COPIED</p>
+        <p id="hint" class="copy-hint">✓ COPIED WITH D-TIME</p>
     </div>
 </div>
 
@@ -181,21 +178,19 @@
         localStorage.setItem('mdm_notes', document.getElementById('notes').value);
     }
 
-    function getFormattedTime() {
-        const now = new Date();
-        const dateStr = `${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()}`;
-        const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).toLowerCase();
-        try {
-            const tzStr = new Intl.DateTimeFormat('en-US', { timeZoneName: 'short' }).formatToParts(now).find(p => p.type === 'timeZoneName').value;
-            return `${dateStr} at ${timeStr} (${tzStr})`;
-        } catch(e) { return `${dateStr} at ${timeStr}`; }
+    function getDiscordTimestamp() {
+        // Gets current time in Unix (seconds)
+        return Math.floor(Date.now() / 1000);
     }
 
     function generateAndCopy() {
         const name = document.getElementById('patientName').value.trim() || "Unknown Subject";
         const notes = document.getElementById('notes').value.trim() || "- No notes recorded.";
-        const time = getFormattedTime();
-        const markdown = `# ${name}\n**Logged:** ${time}\n\n**Notes:**\n${notes}`;
+        
+        // Dynamic Discord Timestamp (Type 'f' is Full Date/Time)
+        const dTime = `<t:${getDiscordTimestamp()}:f>`;
+        
+        const markdown = `# ${name}\n**Logged:** ${dTime}\n\n**Notes:**\n${notes}`;
 
         navigator.clipboard.writeText(markdown).then(() => {
             const hint = document.getElementById('hint');
