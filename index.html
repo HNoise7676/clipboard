@@ -7,137 +7,152 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#7b5e42">
-    <link rel="manifest" href="manifest.json">
 
     <title>MDM Field Clipboard</title>
     <style>
         :root {
             --board: #7b5e42; 
             --paper: #fdfdfd;
-            --clip: #b0b0b0;
             --accent: #d9534f; 
-            --text: #333;
-            --instruction: #666;
+            --text: #222;
+            --label-clr: #555;
         }
 
         body { 
             background-color: #1a1c1e; 
             display: flex; 
             justify-content: center; 
-            padding: 20px;
+            padding: 10px;
             margin: 0;
             font-family: 'Courier New', Courier, monospace;
-            overflow-x: hidden;
         }
 
         .clipboard {
             background: var(--board);
             width: 100%;
-            max-width: 480px;
-            padding: 60px 15px 20px 15px;
-            border-radius: 15px;
+            max-width: 550px; /* Slightly wider for better readability */
+            padding: 50px 15px 20px 15px;
+            border-radius: 12px;
             position: relative;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
             box-sizing: border-box;
             margin-top: 20px;
         }
 
+        /* The Metal Clip */
         .clipboard::before {
             content: "";
             position: absolute;
-            top: -10px;
+            top: -5px;
             left: 50%;
             transform: translateX(-50%);
-            width: 140px;
-            height: 50px;
-            background: linear-gradient(to bottom, #e0e0e0, #999);
+            width: 160px;
+            height: 45px;
+            background: linear-gradient(to bottom, #d1d1d1, #888);
             border-radius: 4px;
             z-index: 2;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.4);
         }
 
         .paper {
             background: var(--paper);
-            background-image: radial-gradient(#e5e5e5 1px, transparent 1px);
-            background-size: 24px 24px;
-            padding: 25px;
-            min-height: 550px;
-            box-shadow: 2px 2px 15px rgba(0,0,0,0.3);
+            background-image: linear-gradient(#e5e5e5 1px, transparent 1px);
+            background-size: 100% 28px; /* Simulated lined paper */
+            padding: 30px;
+            min-height: 700px; /* Taller for more note space */
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
             color: var(--text);
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
         }
 
         h2 { 
             text-align: center; 
-            margin: 0 0 15px 0; 
+            margin: 0 0 20px 0; 
             color: var(--accent); 
-            border-bottom: 3px double var(--accent);
-            padding-bottom: 5px;
-            font-size: 1.3rem;
+            border-bottom: 2px solid var(--accent);
+            letter-spacing: 1px;
+            font-size: 1.4rem;
         }
 
-        .instructions {
-            background: #f1f1f1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            margin-bottom: 20px;
-            font-size: 0.75rem;
-            color: var(--instruction);
-            line-height: 1.3;
+        .field-row {
+            margin-bottom: 12px;
         }
 
         label { 
             display: block; 
-            margin: 20px 0 5px; 
             font-weight: bold; 
-            font-size: 0.8rem; 
+            font-size: 0.85rem; 
+            color: var(--label-clr);
             text-transform: uppercase;
+            margin-bottom: 2px;
         }
 
-        input, textarea { 
+        input, select, textarea { 
             width: 100%; 
-            padding: 10px; 
+            padding: 8px 4px; 
             border: none; 
-            border-bottom: 1px dashed #aaa; 
-            background: transparent; 
-            color: #111; 
+            border-bottom: 1px solid #999; 
+            background: rgba(255,255,255,0.5); 
+            color: #000; 
             box-sizing: border-box; 
             font-family: inherit;
-            font-size: 1rem;
-            resize: none; 
+            font-size: 1.05rem;
+            outline: none;
+            transition: border-color 0.2s;
         }
 
-        textarea { border: 1px dashed #aaa; margin-top: 5px; }
+        input:focus, select:focus, textarea:focus {
+            border-bottom: 2px solid var(--accent);
+            background: rgba(255,255,255,0.8);
+        }
+
+        /* Large Notes Section */
+        .notes-area {
+            flex-grow: 1; /* Pushes notes to fill remaining space */
+            display: flex;
+            flex-direction: column;
+            margin-top: 10px;
+        }
+
+        textarea { 
+            flex-grow: 1;
+            line-height: 28px; /* Matches the paper lines */
+            resize: none; 
+            border: 1px dashed #ccc;
+            padding: 10px;
+        }
         
-        .btn-group { display: flex; gap: 8px; margin-top: 30px; }
+        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
         
         button { 
             flex: 1; 
-            padding: 12px; 
-            border: 2px solid #444; 
-            background: #fff; 
+            padding: 15px; 
+            border: 1px solid #333; 
+            background: #eee; 
             cursor: pointer; 
             font-family: inherit; 
             font-weight: bold;
-            font-size: 0.9rem;
-            text-transform: uppercase;
+            font-size: 1rem;
         }
 
-        button.primary { background: var(--accent); color: white; border-color: #8e2825; }
+        button.primary { background: var(--accent); color: white; border: none; }
+        button.primary:active { background: #b53a37; }
         
         .copy-hint { 
             text-align: center; 
-            font-size: 0.85rem; 
-            margin-top: 15px; 
+            font-size: 0.9rem; 
+            margin-top: 10px; 
             color: #2d7a5a; 
             font-weight: bold; 
-            opacity: 0; 
+            visibility: hidden;
         }
 
-        @media (max-width: 400px) {
+        @media (max-width: 480px) {
             .paper { padding: 15px; }
             h2 { font-size: 1.1rem; }
-            .clipboard::before { width: 100px; }
+            input, select, textarea { font-size: 1rem; }
         }
     </style>
 </head>
@@ -145,65 +160,119 @@
 
 <div class="clipboard">
     <div class="paper">
-        <h2>MDM FIELD MEDIC REPORT</h2>
+        <h2>FIELD EXAM REPORT</h2>
         
-        <div class="instructions">
-            <b>NOTICE:</b> Vibe-coded. Things may break.<br>
-            <b>FORMATTING:</b> Use <b>"-"</b> for lists.
+        <div class="field-row">
+            <label>Nurse / Examiner</label>
+            <input type="text" id="nurseName" placeholder="Name..." oninput="autoSave()">
         </div>
 
-        <label>Patient Identity</label>
-        <input type="text" id="patientName" placeholder="ENTER NAME..." oninput="autoSave()">
+        <div class="field-row">
+            <label>Patient Name</label>
+            <input type="text" id="patientName" placeholder="Subject..." oninput="autoSave()">
+        </div>
 
-        <label>Clinical Observations</label>
-        <textarea id="notes" rows="10" placeholder="- item one&#10;- item two" oninput="autoSave()"></textarea>
+        <div class="field-row">
+            <label>Exam Timing</label>
+            <select id="examHours" onchange="autoSave()">
+                <option value="Hospital Hours">Within Hospital Hours</option>
+                <option value="Off-Hours">Off-Hours / Emergency</option>
+            </select>
+        </div>
+
+        <div class="field-row">
+            <label>Record Visibility</label>
+            <select id="examPrivacy" onchange="autoSave()">
+                <option value="Public (Hospital Chat)">Public (In-Chat Record)</option>
+                <option value="Private (Direct Messages)">Private (DMs Only)</option>
+            </select>
+        </div>
+
+        <div class="field-row">
+            <label>Post-Exam Status</label>
+            <select id="patientStatus" onchange="autoSave()">
+                <option value="Soldier">Soldier (Stable)</option>
+                <option value="Nutter">Nutter (Unstable)</option>
+            </select>
+        </div>
+
+        <div class="notes-area">
+            <label>Clinical Observations & Notes</label>
+            <textarea id="notes" placeholder="Start typing clinical notes here..." oninput="autoSave()"></textarea>
+        </div>
 
         <div class="btn-group">
             <button class="primary" onclick="generateAndCopy()">SIGN & COPY</button>
             <button onclick="clearForm()">VOID</button>
         </div>
         
-        <p id="hint" class="copy-hint">✓ COPIED</p>
+        <p id="hint" class="copy-hint">✓ REPORT COPIED</p>
     </div>
 </div>
 
 <script>
+    const fields = ['nurseName', 'patientName', 'examHours', 'examPrivacy', 'patientStatus', 'notes'];
+
     window.onload = () => {
-        if (localStorage.getItem('mdm_patient')) document.getElementById('patientName').value = localStorage.getItem('mdm_patient');
-        if (localStorage.getItem('mdm_notes')) document.getElementById('notes').value = localStorage.getItem('mdm_notes');
+        fields.forEach(field => {
+            const saved = localStorage.getItem('mdm_v2_' + field);
+            if (saved) document.getElementById(field).value = saved;
+        });
     };
 
     function autoSave() {
-        localStorage.setItem('mdm_patient', document.getElementById('patientName').value);
-        localStorage.setItem('mdm_notes', document.getElementById('notes').value);
+        fields.forEach(field => {
+            localStorage.setItem('mdm_v2_' + field, document.getElementById(field).value);
+        });
     }
 
     function getDiscordTimestamp() {
-        // Gets current time in Unix (seconds)
         return Math.floor(Date.now() / 1000);
     }
 
     function generateAndCopy() {
-        const name = document.getElementById('patientName').value.trim() || "Unknown Subject";
-        const notes = document.getElementById('notes').value.trim() || "- No notes recorded.";
+        const nurse = document.getElementById('nurseName').value.trim() || "N/A";
+        const patient = document.getElementById('patientName').value.trim() || "Unknown";
+        const hours = document.getElementById('examHours').value;
+        const privacy = document.getElementById('examPrivacy').value;
+        const status = document.getElementById('patientStatus').value;
+        const notes = document.getElementById('notes').value.trim() || "- No notes provided.";
         
-        // Dynamic Discord Timestamp (Type 'f' is Full Date/Time)
-        const dTime = `<t:${getDiscordTimestamp()}:f>`;
+        const dTime = `<t:${getDiscordTimestamp()}:F>`;
         
-        const markdown = `# ${name}\n**Logged:** ${dTime}\n\n**Notes:**\n${notes}`;
+        const logTemplate = `Nurse Name: ${nurse}
 
-        navigator.clipboard.writeText(markdown).then(() => {
+Patient name: ${patient}
+
+Date of examination: ${dTime}
+
+Was this exam during hospital hours or off-hours: ${hours}
+
+Was this examination started publicly or in private: ${privacy}
+
+Patient Status Post-Exam: ${status}
+
+**Notes:**
+${notes}`;
+
+        navigator.clipboard.writeText(logTemplate).then(() => {
             const hint = document.getElementById('hint');
-            hint.style.opacity = '1';
-            setTimeout(() => { hint.style.opacity = '0'; }, 3000);
+            hint.style.visibility = 'visible';
+            setTimeout(() => { hint.style.visibility = 'hidden'; }, 3000);
         });
     }
 
     function clearForm() {
-        if (confirm("VOID this record?")) {
-            document.getElementById('patientName').value = '';
-            document.getElementById('notes').value = '';
-            localStorage.clear();
+        if (confirm("Clear this report? Data cannot be recovered.")) {
+            fields.forEach(field => {
+                const el = document.getElementById(field);
+                if (el.tagName === 'SELECT') {
+                    el.selectedIndex = 0;
+                } else {
+                    el.value = '';
+                }
+                localStorage.removeItem('mdm_v2_' + field);
+            });
         }
     }
 </script>
