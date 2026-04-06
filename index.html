@@ -3,106 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MDM Medic Clipboard</title>
+    <title>MDM Field Clipboard</title>
     <style>
         :root {
-            --bg: #2c2f33;
-            --card: #36393f;
-            --text: #ffffff;
-            --accent: #5865F2;
-            --success: #43b581;
-            --input: #40444b;
+            --board: #7b5e42; /* Wood color */
+            --paper: #fdfdfd;
+            --clip: #b0b0b0;
+            --accent: #d9534f; /* Medical Red */
+            --text: #333;
         }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; padding: 20px; }
-        .card { background: var(--card); padding: 25px; border-radius: 12px; width: 100%; max-width: 450px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
-        h2 { text-align: center; color: var(--accent); margin-top: 0; letter-spacing: 1px; border-bottom: 1px solid #4f545c; padding-bottom: 10px; }
+
+        body { 
+            background-color: #2c2f33; 
+            display: flex; 
+            justify-content: center; 
+            padding: 40px 20px;
+            font-family: 'Courier New', Courier, monospace; /* Typewriter feel */
+        }
+
+        /* The Wooden Board */
+        .clipboard {
+            background: var(--board);
+            width: 100%;
+            max-width: 450px;
+            padding: 60px 20px 20px 20px;
+            border-radius: 15px;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+
+        /* The Metal Clip */
+        .clipboard::before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 50px;
+            background: linear-gradient(to bottom, #d1d1d1, #888);
+            border-radius: 5px;
+            z-index: 2;
+            box-shadow: 0 4px 5px rgba(0,0,0,0.3);
+        }
+
+        /* The Paper */
+        .paper {
+            background: var(--paper);
+            background-image: radial-gradient(#e5e5e5 1px, transparent 1px);
+            background-size: 20px 20px; /* Subtle grid/dots */
+            padding: 30px;
+            min-height: 500px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+            color: var(--text);
+        }
+
+        h2 { 
+            text-align: center; 
+            margin-top: 0; 
+            color: var(--accent); 
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+            font-weight: bold;
+        }
+
+        label { 
+            display: block; 
+            margin: 20px 0 5px; 
+            font-weight: bold; 
+            font-size: 0.9rem; 
+            text-transform: uppercase;
+        }
+
+        input, textarea { 
+            width: 100%; 
+            padding: 10px; 
+            border: none; 
+            border-bottom: 1px dashed #999; 
+            background: transparent; 
+            color: #222; 
+            box-sizing: border-box; 
+            font-family: inherit;
+            font-size: 1.1rem;
+        }
+
+        input:focus, textarea:focus { outline: none; border-bottom: 1px solid var(--accent); }
+
+        .btn-group { display: flex; gap: 10px; margin-top: 40px; }
         
-        .field-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; color: #b9bbbe; }
+        button { 
+            flex: 1; 
+            padding: 12px; 
+            border: 2px solid #555; 
+            background: #eee; 
+            cursor: pointer; 
+            font-family: inherit; 
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        button.primary { background: var(--accent); color: white; border-color: #a9322d; }
+        button:hover { filter: brightness(0.9); transform: translateY(-1px); }
         
-        input, textarea { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #23272a; background: var(--input); color: white; box-sizing: border-box; font-size: 1rem; }
-        
-        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
-        button.primary { flex: 2; padding: 14px; border: none; border-radius: 6px; background: var(--accent); color: white; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 1rem; }
-        button.secondary { flex: 1; background: #ed4245; border: none; border-radius: 6px; color: white; cursor: pointer; }
-        
-        button:hover { opacity: 0.9; }
-        .copy-hint { text-align: center; font-size: 0.9em; margin-top: 15px; color: var(--success); font-weight: bold; opacity: 0; transition: 0.3s; }
+        .copy-hint { 
+            text-align: center; 
+            font-size: 0.8rem; 
+            margin-top: 15px; 
+            color: #43b581; 
+            font-weight: bold; 
+            opacity: 0; 
+        }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>FIELD MEDIC UNIT</h2>
-    
-    <div class="field-group">
+<div class="clipboard">
+    <div class="paper">
+        <h2>MEDICAL REPORT</h2>
+        
         <label>Patient Name</label>
-        <input type="text" id="patientName" placeholder="e.g. Crowl" oninput="autoSave()">
-    </div>
+        <input type="text" id="patientName" placeholder="NAME HERE..." oninput="autoSave()">
 
-    <div class="field-group">
         <label>Clinical Notes</label>
-        <textarea id="notes" rows="8" placeholder="- symptom 1&#10;- symptom 2" oninput="autoSave()"></textarea>
-    </div>
+        <textarea id="notes" rows="12" placeholder="- observations&#10;- symptoms" oninput="autoSave()"></textarea>
 
-    <div class="btn-group">
-        <button class="primary" onclick="generateAndCopy()">Copy to Discord</button>
-        <button class="secondary" onclick="clearForm()">Clear All</button>
+        <div class="btn-group">
+            <button class="primary" onclick="generateAndCopy()">COPY RECORD</button>
+            <button onclick="clearForm()">CLEAR</button>
+        </div>
+        
+        <p id="hint" class="copy-hint">RECORD SIGNED & COPIED</p>
     </div>
-    
-    <p id="hint" class="copy-hint">Timestamped & Copied!</p>
 </div>
 
 <script>
-// 1. Load data from memory when the page opens
-window.onload = () => {
-    if (localStorage.getItem('mdm_patient')) {
-        document.getElementById('patientName').value = localStorage.getItem('mdm_patient');
+    // Load data from memory
+    window.onload = () => {
+        if (localStorage.getItem('mdm_patient')) document.getElementById('patientName').value = localStorage.getItem('mdm_patient');
+        if (localStorage.getItem('mdm_notes')) document.getElementById('notes').value = localStorage.getItem('mdm_notes');
+    };
+
+    function autoSave() {
+        localStorage.setItem('mdm_patient', document.getElementById('patientName').value);
+        localStorage.setItem('mdm_notes', document.getElementById('notes').value);
     }
-    if (localStorage.getItem('mdm_notes')) {
-        document.getElementById('notes').value = localStorage.getItem('mdm_notes');
+
+    function getFormattedTime() {
+        const now = new Date();
+        const dateStr = `${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()}`;
+        const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).toLowerCase();
+        const tzStr = new Intl.DateTimeFormat('en-US', { timeZoneName: 'short' }).formatToParts(now).find(p => p.type === 'timeZoneName').value;
+        return `${dateStr} at ${timeStr} (${tzStr})`;
     }
-};
 
-// 2. Save data to memory every time you type a character
-function autoSave() {
-    localStorage.setItem('mdm_patient', document.getElementById('patientName').value);
-    localStorage.setItem('mdm_notes', document.getElementById('notes').value);
-}
+    function generateAndCopy() {
+        const name = document.getElementById('patientName').value.trim() || "Unknown Patient";
+        const notes = document.getElementById('notes').value.trim();
+        const time = getFormattedTime();
+        
+        const markdown = `# ${name}\n**Logged:** ${time}\n\n**Notes:**\n${notes}`;
 
-function getFormattedTime() {
-    const now = new Date();
-    const dateStr = `${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()}`;
-    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).toLowerCase();
-    
-    // Auto-detect timezone
-    const tzStr = new Intl.DateTimeFormat('en-US', { timeZoneName: 'short' }).formatToParts(now).find(p => p.type === 'timeZoneName').value;
-
-    return `${dateStr} at ${timeStr} (${tzStr})`;
-}
-
-function generateAndCopy() {
-    const name = document.getElementById('patientName').value.trim() || "Unknown Patient";
-    const notes = document.getElementById('notes').value.trim();
-    const time = getFormattedTime();
-    
-    const markdown = `# ${name}\n**Logged:** ${time}\n\n**Notes:**\n${notes}`;
-
-    navigator.clipboard.writeText(markdown).then(() => {
-        const hint = document.getElementById('hint');
-        hint.style.opacity = '1';
-        setTimeout(() => { hint.style.opacity = '0'; }, 2000);
-    });
-}
-
-function clearForm() {
-    if (confirm("Are you sure you want to clear the clipboard? This cannot be undone.")) {
-        document.getElementById('patientName').value = '';
-        document.getElementById('notes').value = '';
-        localStorage.removeItem('mdm_patient');
-        localStorage.removeItem('mdm_notes');
+        navigator.clipboard.writeText(markdown).then(() => {
+            const hint = document.getElementById('hint');
+            hint.style.opacity = '1';
+            setTimeout(() => { hint.style.opacity = '0'; }, 2000);
+        });
     }
-}
+
+    function clearForm() {
+        if (confirm("Destroy this record?")) {
+            document.getElementById('patientName').value = '';
+            document.getElementById('notes').value = '';
+            localStorage.clear();
+        }
+    }
 </script>
 
 </body>
