@@ -1,0 +1,15 @@
+{
+  "name": "MDM Field Medic Clipboard",
+  "short_name": "Medic App",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#1a1c1e",
+  "theme_color": "#7b5e42",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/822/822118.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

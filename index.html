@@ -2,7 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#7b5e42">
+    <link rel="manifest" href="manifest.json">
+
     <title>MDM Field Clipboard</title>
     <style>
         :root {
@@ -18,18 +24,23 @@
             background-color: #1a1c1e; 
             display: flex; 
             justify-content: center; 
-            padding: 40px 20px;
+            padding: 20px;
+            margin: 0;
             font-family: 'Courier New', Courier, monospace;
+            /* Prevents weird bouncing on mobile */
+            overflow-x: hidden;
         }
 
         .clipboard {
             background: var(--board);
             width: 100%;
             max-width: 480px;
-            padding: 65px 20px 25px 20px;
+            padding: 60px 15px 20px 15px;
             border-radius: 15px;
             position: relative;
             box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+            box-sizing: border-box;
+            margin-top: 20px;
         }
 
         .clipboard::before {
@@ -38,8 +49,8 @@
             top: -10px;
             left: 50%;
             transform: translateX(-50%);
-            width: 160px;
-            height: 55px;
+            width: 140px;
+            height: 50px;
             background: linear-gradient(to bottom, #e0e0e0, #999);
             border-radius: 4px;
             z-index: 2;
@@ -50,10 +61,11 @@
             background: var(--paper);
             background-image: radial-gradient(#e5e5e5 1px, transparent 1px);
             background-size: 24px 24px;
-            padding: 35px;
-            min-height: 600px;
+            padding: 25px;
+            min-height: 550px;
             box-shadow: 2px 2px 15px rgba(0,0,0,0.3);
             color: var(--text);
+            box-sizing: border-box;
         }
 
         h2 { 
@@ -62,29 +74,25 @@
             color: var(--accent); 
             border-bottom: 3px double var(--accent);
             padding-bottom: 5px;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
         }
 
-        /* The Instructions / Warnings Section */
         .instructions {
             background: #f1f1f1;
             padding: 10px;
             border: 1px solid #ddd;
             margin-bottom: 20px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--instruction);
-            line-height: 1.4;
+            line-height: 1.3;
         }
-
-        .instructions b { color: var(--accent); }
 
         label { 
             display: block; 
-            margin: 25px 0 5px; 
+            margin: 20px 0 5px; 
             font-weight: bold; 
-            font-size: 0.85rem; 
+            font-size: 0.8rem; 
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         input, textarea { 
@@ -96,38 +104,43 @@
             color: #111; 
             box-sizing: border-box; 
             font-family: inherit;
-            font-size: 1.1rem;
+            font-size: 1rem;
+            /* REMOVE RESIZE ABILITY */
+            resize: none; 
         }
 
-        textarea { border: 1px dashed #aaa; margin-top: 5px; padding: 10px; }
-        input:focus, textarea:focus { outline: none; border-color: var(--accent); background: rgba(217, 83, 79, 0.05); }
-
-        .btn-group { display: flex; gap: 10px; margin-top: 40px; }
+        textarea { border: 1px dashed #aaa; margin-top: 5px; }
+        
+        .btn-group { display: flex; gap: 8px; margin-top: 30px; }
         
         button { 
             flex: 1; 
-            padding: 14px; 
+            padding: 12px; 
             border: 2px solid #444; 
             background: #fff; 
             cursor: pointer; 
             font-family: inherit; 
             font-weight: bold;
+            font-size: 0.9rem;
             text-transform: uppercase;
-            transition: all 0.2s;
         }
 
         button.primary { background: var(--accent); color: white; border-color: #8e2825; }
-        button:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-        button:active { transform: translateY(0); }
         
         .copy-hint { 
             text-align: center; 
-            font-size: 0.9rem; 
-            margin-top: 20px; 
+            font-size: 0.85rem; 
+            margin-top: 15px; 
             color: #2d7a5a; 
             font-weight: bold; 
             opacity: 0; 
-            transition: opacity 0.3s;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 400px) {
+            .paper { padding: 15px; }
+            h2 { font-size: 1.1rem; }
+            .clipboard::before { width: 100px; }
         }
     </style>
 </head>
@@ -138,8 +151,8 @@
         <h2>MDM FIELD MEDIC REPORT</h2>
         
         <div class="instructions">
-            <b>NOTICE:</b> This tool is <u>vibe-coded</u> things may break.<br>
-            <b>FORMATTING:</b> Please use a dash <b>"-"</b> at the start of each line in the Notes section for proper list rendering.
+            <b>NOTICE:</b> Vibe-coded. Things may break.<br>
+            <b>FORMATTING:</b> Use <b>"-"</b> for lists.
         </div>
 
         <label>Patient Identity</label>
@@ -150,10 +163,10 @@
 
         <div class="btn-group">
             <button class="primary" onclick="generateAndCopy()">SIGN & COPY</button>
-            <button onclick="clearForm()">VOID RECORD</button>
+            <button onclick="clearForm()">VOID</button>
         </div>
         
-        <p id="hint" class="copy-hint">✓ RECORD COPIED TO CLIPBOARD</p>
+        <p id="hint" class="copy-hint">✓ COPIED</p>
     </div>
 </div>
 
@@ -172,20 +185,16 @@
         const now = new Date();
         const dateStr = `${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()}`;
         const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).toLowerCase();
-        
         try {
             const tzStr = new Intl.DateTimeFormat('en-US', { timeZoneName: 'short' }).formatToParts(now).find(p => p.type === 'timeZoneName').value;
             return `${dateStr} at ${timeStr} (${tzStr})`;
-        } catch(e) {
-            return `${dateStr} at ${timeStr}`;
-        }
+        } catch(e) { return `${dateStr} at ${timeStr}`; }
     }
 
     function generateAndCopy() {
         const name = document.getElementById('patientName').value.trim() || "Unknown Subject";
         const notes = document.getElementById('notes').value.trim() || "- No notes recorded.";
         const time = getFormattedTime();
-        
         const markdown = `# ${name}\n**Logged:** ${time}\n\n**Notes:**\n${notes}`;
 
         navigator.clipboard.writeText(markdown).then(() => {
@@ -196,13 +205,12 @@
     }
 
     function clearForm() {
-        if (confirm("Are you sure you want to VOID this record? All unsaved data will be lost.")) {
+        if (confirm("VOID this record?")) {
             document.getElementById('patientName').value = '';
             document.getElementById('notes').value = '';
             localStorage.clear();
         }
     }
 </script>
-
 </body>
 </html>
